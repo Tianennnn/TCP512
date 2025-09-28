@@ -443,6 +443,9 @@ public class TCPMiddleware implements IResourceManager {
         TCPMessage message = new TCPMessage("deleteFlight", flightNum);
         boolean result = (Boolean) flightRM.sendMessage(message);
         System.out.println("DEBUG: deleteFlight result: " + result);
+        if (result) {
+            m_Flights_available.remove(flightNum);
+        }
         return result;
     }
 
@@ -456,6 +459,9 @@ public class TCPMiddleware implements IResourceManager {
         TCPMessage message = new TCPMessage("deleteCars", location);
         boolean result = (Boolean) carRM.sendMessage(message);
         System.out.println("DEBUG: deleteCars result: " + result);
+        if (result) {
+            m_Cars_available.remove(location);
+        }
         return result;
     }
 
@@ -469,6 +475,9 @@ public class TCPMiddleware implements IResourceManager {
         TCPMessage message = new TCPMessage("deleteRooms", location);
         boolean result = (Boolean) roomRM.sendMessage(message);
         System.out.println("DEBUG: deleteRooms result: " + result);
+        if (result) {
+            m_Rooms_available.remove(location);
+        }
         return result;
     }
 
