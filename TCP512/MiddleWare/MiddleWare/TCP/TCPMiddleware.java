@@ -69,7 +69,7 @@ public class TCPMiddleware implements IResourceManager {
                 System.out.println("Connected to " + serverName + " resource manager");
                 return true;
             } catch (IOException e) {
-                System.err.println("Failed to connect to " + serverName + ": " + e.getMessage());
+                // System.err.println("Failed to connect to " + serverName + ": " + e.getMessage());
                 connected = false;
                 return false;
             }
