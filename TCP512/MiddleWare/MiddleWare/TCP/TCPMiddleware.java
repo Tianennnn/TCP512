@@ -230,7 +230,16 @@ public class TCPMiddleware implements IResourceManager {
                     return reserveRoom((Integer) params[0], (String) params[1]);
 
                 case "bundle":
-                    return bundle((Integer) params[0], (Vector<String>) params[1],
+                    Vector<String> flightNumbers;
+                    if (params[1] instanceof Vector<?>) {
+                        flightNumbers = new Vector<>();
+                        for (Object obj : (Vector<?>) params[1]) {
+                            flightNumbers.add(String.valueOf(obj));
+                        }
+                    } else {
+                        throw new IllegalArgumentException("Expected Vector<String> for flightNumbers");
+                    }
+                    return bundle((Integer) params[0], flightNumbers,
                             (String) params[2], (Boolean) params[3], (Boolean) params[4]);
 
                 case "getName":

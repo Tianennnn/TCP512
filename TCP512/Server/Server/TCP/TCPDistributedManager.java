@@ -19,7 +19,6 @@ public class TCPDistributedManager extends DistributedResourceManager {
             TCPDistributedManager.s_serverName = args[0];
         }
 
-
         try {
             TCPDistributedManager server = new TCPDistributedManager(TCPDistributedManager.s_serverName);
 
@@ -193,7 +192,16 @@ public class TCPDistributedManager extends DistributedResourceManager {
                 return reserveRoom((Integer) params[0], (String) params[1]);
 
             case "bundle":
-                return bundle((Integer) params[0], (Vector<String>) params[1],
+                Vector<String> locations;
+                if (params[1] instanceof Vector<?>) {
+                    locations = new Vector<>();
+                    for (Object obj : (Vector<?>) params[1]) {
+                        locations.add((String) obj);
+                    }
+                } else {
+                    throw new IllegalArgumentException("Expected Vector<String> for bundle locations");
+                }
+                return bundle((Integer) params[0], locations,
                         (String) params[2], (Boolean) params[3], (Boolean) params[4]);
 
             case "getName":
