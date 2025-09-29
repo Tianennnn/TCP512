@@ -11,7 +11,7 @@ import Server.Common.TCPMessage;
 public class TCPClient extends Client
 {
 	private static String s_serverHost = "localhost";
-	private static int s_serverPort = 1045;
+	private static int s_serverPort = 1046;
 	private static String s_serverName = "MiddleWare";
 
 	// TCP connection components

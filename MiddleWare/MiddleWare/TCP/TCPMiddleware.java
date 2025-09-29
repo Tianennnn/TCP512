@@ -12,8 +12,8 @@ import java.rmi.RemoteException;
 public class TCPMiddleware implements IResourceManager {
 
     private static String s_middleWareName = "MiddleWare";
-    private static int s_middleWarePort = 1045;  // Port for client connections
-    private static int s_serverPort = 1046;     // Base port for resource managers
+    private static int s_middleWarePort = 1046;  // Port for client connections
+    private static int s_serverPort = 1045;     // Base port for resource managers
 
     // Server connection details
     private static String s_server_car = "localhost";
@@ -21,7 +21,7 @@ public class TCPMiddleware implements IResourceManager {
     private static String s_server_flight = "localhost";
 
     private static String s_carRM = "Cars";
-    private static String s_roomRM = "Room";
+    private static String s_roomRM = "Rooms";
     private static String s_flightRM = "Flights";
 
     // Resource Manager connections
@@ -298,8 +298,8 @@ public class TCPMiddleware implements IResourceManager {
     public void connectToResourceManagers() {
         // Create connections
         flightRM = new ResourceManagerConnection(s_server_flight, s_serverPort, s_flightRM);
-        carRM = new ResourceManagerConnection(s_server_car, s_serverPort + 1, s_carRM);
-        roomRM = new ResourceManagerConnection(s_server_room, s_serverPort + 2, s_roomRM);
+        carRM = new ResourceManagerConnection(s_server_car, s_serverPort, s_carRM);
+        roomRM = new ResourceManagerConnection(s_server_room, s_serverPort, s_roomRM);
 
         // Start connection threads
         Thread flightThread = new Thread(() -> connectWithRetry(flightRM));
@@ -386,9 +386,8 @@ public class TCPMiddleware implements IResourceManager {
         }
     }
 
-    // Implementation of IResourceManager methods that forward to resource managers
-    @Override
-    public boolean addFlight(int flightNum, int flightSeats, int flightPrice) throws RemoteException {
+
+    public synchronized boolean addFlight(int flightNum, int flightSeats, int flightPrice) throws RemoteException {
         System.out.println("DEBUG: addFlight called - Flight: " + flightNum + ", Seats: " + flightSeats + ", Price: " + flightPrice);
         m_Flights_available.merge(flightNum, flightSeats, Integer::sum);
         TCPMessage message = new TCPMessage("addFlight", flightNum, flightSeats, flightPrice);
@@ -398,7 +397,7 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public boolean addCars(String location, int numCars, int price) throws RemoteException {
+    public synchronized boolean addCars(String location, int numCars, int price) throws RemoteException {
         System.out.println("DEBUG: addCars called - Location: " + location + ", Cars: " + numCars + ", Price: " + price);
         m_Cars_available.merge(location, numCars, Integer::sum);
         TCPMessage message = new TCPMessage("addCars", location, numCars, price);
@@ -408,7 +407,7 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public boolean addRooms(String location, int numRooms, int price) throws RemoteException {
+    public synchronized boolean addRooms(String location, int numRooms, int price) throws RemoteException {
         System.out.println("DEBUG: addRooms called - Location: " + location + ", Rooms: " + numRooms + ", Price: " + price);
         m_Rooms_available.merge(location, numRooms, Integer::sum);
         TCPMessage message = new TCPMessage("addRooms", location, numRooms, price);
@@ -418,7 +417,7 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public int newCustomer() throws RemoteException {
+    public synchronized int newCustomer() throws RemoteException {
         System.out.println("DEBUG: newCustomer called (auto-generate ID)");
         int customerId = customerManager.newCustomer();
         System.out.println("DEBUG: newCustomer created with ID: " + customerId);
@@ -426,7 +425,7 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public boolean newCustomer(int cid) throws RemoteException {
+    public synchronized boolean newCustomer(int cid) throws RemoteException {
         System.out.println("DEBUG: newCustomer called with specific ID: " + cid);
         boolean result = customerManager.newCustomer(cid);
         System.out.println("DEBUG: newCustomer with ID " + cid + " result: " + result);
@@ -434,7 +433,7 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public boolean deleteFlight(int flightNum) throws RemoteException {
+    public synchronized boolean deleteFlight(int flightNum) throws RemoteException {
         System.out.println("DEBUG: deleteFlight called - Flight: " + flightNum);
         if (customerManager.isFlightReserved(flightNum)) {
             System.out.println("DEBUG: deleteFlight failed - flight " + flightNum + " has reservations");
@@ -450,7 +449,7 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public boolean deleteCars(String location) throws RemoteException {
+    public synchronized boolean deleteCars(String location) throws RemoteException {
         System.out.println("DEBUG: deleteCars called - Location: " + location);
         if (customerManager.isCarReserved(location)) {
             System.out.println("DEBUG: deleteCars failed - location " + location + " has reservations");
@@ -466,7 +465,7 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public boolean deleteRooms(String location) throws RemoteException {
+    public synchronized boolean deleteRooms(String location) throws RemoteException {
         System.out.println("DEBUG: deleteRooms called - Location: " + location);
         if (customerManager.isRoomReserved(location)) {
             System.out.println("DEBUG: deleteRooms failed - location " + location + " has reservations");
@@ -482,7 +481,7 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public boolean deleteCustomer(int customerID) throws RemoteException {
+    public synchronized boolean deleteCustomer(int customerID) throws RemoteException {
         System.out.println("DEBUG: deleteCustomer called - Customer ID: " + customerID);
         Map<Integer, Integer> reservedFlights = customerManager.getCustomerFlights(customerID);
         Map<String, Integer> reservedCars = customerManager.getCustomerCars(customerID);
@@ -504,7 +503,7 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public int queryFlight(int flightNumber) throws RemoteException {
+    public synchronized int queryFlight(int flightNumber) throws RemoteException {
         System.out.println("DEBUG: queryFlight called - Flight: " + flightNumber);
         int seat = 0;
         Integer seats = m_Flights_available.get(flightNumber);
@@ -516,7 +515,7 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public int queryCars(String location) throws RemoteException {
+    public synchronized int queryCars(String location) throws RemoteException {
         System.out.println("DEBUG: queryCars called - Location: " + location);
         int cars = 0;
         Integer seats = m_Cars_available.get(location);
@@ -528,7 +527,7 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public int queryRooms(String location) throws RemoteException {
+    public synchronized int queryRooms(String location) throws RemoteException {
         System.out.println("DEBUG: queryRooms called - Location: " + location);
         int rooms = 0;
         Integer seats = m_Rooms_available.get(location);
@@ -540,7 +539,7 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public String queryCustomerInfo(int customerID) throws RemoteException {
+    public synchronized String queryCustomerInfo(int customerID) throws RemoteException {
         System.out.println("DEBUG: queryCustomerInfo called - Customer ID: " + customerID);
         Map<Integer, Integer> reservedFlights = customerManager.getCustomerFlights(customerID);
         Map<String, Integer> reservedCars = customerManager.getCustomerCars(customerID);
@@ -613,7 +612,7 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public boolean reserveFlight(int customerID, int flightNumber) throws RemoteException {
+    public synchronized boolean reserveFlight(int customerID, int flightNumber) throws RemoteException {
         System.out.println("DEBUG: reserveFlight called - Customer: " + customerID + ", Flight: " + flightNumber);
         Integer seat = m_Flights_available.get(flightNumber);
 
@@ -635,7 +634,7 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public boolean reserveCar(int customerID, String location) throws RemoteException {
+    public synchronized boolean reserveCar(int customerID, String location) throws RemoteException {
         System.out.println("DEBUG: reserveCar called - Customer: " + customerID + ", Location: " + location);
         Integer seat = m_Cars_available.get(location);
 
@@ -656,7 +655,7 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public boolean reserveRoom(int customerID, String location) throws RemoteException {
+    public synchronized boolean reserveRoom(int customerID, String location) throws RemoteException {
         System.out.println("DEBUG: reserveRoom called - Customer: " + customerID + ", Location: " + location);
         Integer seat = m_Rooms_available.get(location);
 
@@ -678,7 +677,7 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public boolean bundle(int customerID, Vector<String> flightNumbers, String location, boolean car, boolean room) throws RemoteException {
+    public synchronized boolean bundle(int customerID, Vector<String> flightNumbers, String location, boolean car, boolean room) throws RemoteException {
         System.out.println("DEBUG: bundle called - Customer: " + customerID + ", Flights: " + flightNumbers + ", Location: " + location + ", Car: " + car + ", Room: " + room);
 
         for (String flightNumber : flightNumbers) {
