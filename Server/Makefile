@@ -11,3 +11,7 @@ compile-server-tcp: Server/TCP/*.java Server/Interface/IResourceManager.java Ser
 clean:
 	rm -f Server/Interface/*.class Server/Common/*.class Server/RMI/*.class
 	rm -f RMIInterface.jar
+	rm -f Server/TCP/*.class
+	rm -f Server/Interface/*.class
+	rm -f Server/DistributedCommon/*.class
+	rm -f Server/Common/*.class
