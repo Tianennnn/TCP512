@@ -618,12 +618,18 @@ public class TCPMiddleware implements IResourceManager {
         Integer seat = m_Flights_available.get(flightNumber);
 
         if (seat != null && seat > 0) {
-            m_Flights_available.merge(flightNumber, -1, Integer::sum);
-            customerManager.reserveFlight(customerID, flightNumber);
-            System.out.println("DEBUG: reserveFlight successful, remaining seats: " + m_Flights_available.get(flightNumber));
-            return true;
+            boolean result = customerManager.reserveFlight(customerID, flightNumber);
+            if (result) {
+                m_Flights_available.merge(flightNumber, -1, Integer::sum);
+                System.out.println(
+                        "DEBUG: reserveFlight successful, remaining seats: " + m_Flights_available.get(flightNumber));
+            } else {
+                System.out.println("DEBUG: reserveFlight Falied!");
+            }
+            return result;
         } else {
-            System.out.println("DEBUG: reserveFlight failed - insufficient seats available: " + (seat != null ? seat : "null"));
+            System.out.println(
+                    "DEBUG: reserveFlight failed - insufficient seats available: " + (seat != null ? seat : "null"));
             return false;
         }
     }
@@ -634,12 +640,17 @@ public class TCPMiddleware implements IResourceManager {
         Integer seat = m_Cars_available.get(location);
 
         if (seat != null && seat > 0) {
-            m_Cars_available.merge(location, -1, Integer::sum);
-            customerManager.reserveCar(customerID, location);
-            System.out.println("DEBUG: reserveCar successful, remaining cars: " + m_Cars_available.get(location));
-            return true;
+            boolean result = customerManager.reserveCar(customerID, location);
+            if (result) {
+                m_Cars_available.merge(location, -1, Integer::sum);
+                System.out.println("DEBUG: reserveCar successful, remaining cars: " + m_Cars_available.get(location));
+            } else {
+                System.out.println("DEBUG: reserveCar Falied!");
+            }
+            return result;
         } else {
-            System.out.println("DEBUG: reserveCar failed - insufficient cars available: " + (seat != null ? seat : "null"));
+            System.out.println(
+                    "DEBUG: reserveCar failed - insufficient cars available: " + (seat != null ? seat : "null"));
             return false;
         }
     }
@@ -650,12 +661,18 @@ public class TCPMiddleware implements IResourceManager {
         Integer seat = m_Rooms_available.get(location);
 
         if (seat != null && seat > 0) {
-            m_Rooms_available.merge(location, -1, Integer::sum);
-            customerManager.reserveRoom(customerID, location);
-            System.out.println("DEBUG: reserveRoom successful, remaining rooms: " + m_Rooms_available.get(location));
-            return true;
+            boolean result = customerManager.reserveRoom(customerID, location);
+            if (result) {
+                m_Rooms_available.merge(location, -1, Integer::sum);
+                System.out
+                        .println("DEBUG: reserveRoom successful, remaining rooms: " + m_Rooms_available.get(location));
+            } else {
+                System.out.println("DEBUG: reserveRoom Falied!");
+            }
+            return result;
         } else {
-            System.out.println("DEBUG: reserveRoom failed - insufficient rooms available: " + (seat != null ? seat : "null"));
+            System.out.println(
+                    "DEBUG: reserveRoom failed - insufficient rooms available: " + (seat != null ? seat : "null"));
             return false;
         }
     }
