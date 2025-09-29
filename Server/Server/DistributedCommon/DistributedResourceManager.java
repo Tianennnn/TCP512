@@ -13,9 +13,9 @@ import java.util.Vector;
 public class DistributedResourceManager implements IResourceManager {
     protected String m_name = "";
 
-    protected HashMap<Integer, DistributedFlight>  m_flights;
-    protected HashMap<String, DistributedRoom>  m_rooms;
-    protected HashMap<String, DistributedCar>  m_car;
+    protected HashMap<Integer, DistributedFlight> m_flights = new HashMap<>();
+    protected HashMap<String, DistributedRoom> m_rooms = new HashMap<>();
+    protected HashMap<String, DistributedCar> m_car = new HashMap<>();
 
     public DistributedResourceManager(String p_name)
     {
