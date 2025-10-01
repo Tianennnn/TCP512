@@ -95,7 +95,11 @@ public class TCPDistributedManager extends DistributedResourceManager {
                     Object result = processMessage(message);
                     out.writeObject(result);
                     out.flush();
-                } catch (Exception e) {
+                } catch (EOFException e) {
+                    // Middleware disconnected
+                    System.out.println("Middleware disconnected");
+                    break;
+                }catch (Exception e) {
                     System.err.println("Error processing message: " + e.getMessage());
                     e.printStackTrace();
                 }
