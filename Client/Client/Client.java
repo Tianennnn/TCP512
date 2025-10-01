@@ -37,6 +37,7 @@ public abstract class Client
 				System.out.print((char)27 + "[32;1m\n>] " + (char)27 + "[0m");
 				command = stdin.readLine().trim();
 			}
+
 			catch (IOException io) {
 				System.err.println((char)27 + "[31;1mClient exception: " + (char)27 + "[0m" + io.getLocalizedMessage());
 				io.printStackTrace();
@@ -44,6 +45,11 @@ public abstract class Client
 			}
 
 			try {
+				if (command.startsWith("!,")) {
+					String filename = command.substring(2).trim();
+					executeBatchFile(filename);
+					continue;
+				}
 				arguments = parse(command);
 				Command cmd = Command.fromString((String)arguments.elementAt(0));
 				try {
@@ -64,6 +70,57 @@ public abstract class Client
 				System.err.println((char)27 + "[31;1mCommand exception: " + (char)27 + "[0mUncaught exception");
 				e.printStackTrace();
 			}
+		}
+	}
+
+	private void executeBatchFile(String filename)
+	{
+		try (BufferedReader fileReader = new BufferedReader(new FileReader(filename))) {
+			System.out.println("Executing commands from file: " + filename);
+			String line;
+			int lineNumber = 0;
+
+			while ((line = fileReader.readLine()) != null) {
+				lineNumber++;
+				line = line.trim();
+
+				// Skip empty lines and comments
+				if (line.isEmpty() || line.startsWith("#")) {
+					continue;
+				}
+
+				System.out.println((char)27 + "[36m[" + lineNumber + "] " + (char)27 + "[0m" + line);
+
+				try {
+					Vector<String> arguments = parse(line);
+					Command cmd = Command.fromString((String)arguments.elementAt(0));
+					try {
+						execute(cmd, arguments);
+					}
+					catch (ConnectException e) {
+						connectServer();
+						execute(cmd, arguments);
+					}
+				}
+				catch (IllegalArgumentException|ServerException e) {
+					System.err.println((char)27 + "[31;1mCommand exception (line " + lineNumber + "): " + (char)27 + "[0m" + e.getLocalizedMessage());
+				}
+				catch (ConnectException|UnmarshalException e) {
+					System.err.println((char)27 + "[31;1mCommand exception (line " + lineNumber + "): " + (char)27 + "[0mConnection to server lost");
+				}
+				catch (Exception e) {
+					System.err.println((char)27 + "[31;1mCommand exception (line " + lineNumber + "): " + (char)27 + "[0mUncaught exception");
+					e.printStackTrace();
+				}
+			}
+
+			System.out.println("Batch file execution completed.");
+		}
+		catch (FileNotFoundException e) {
+			System.err.println((char)27 + "[31;1mBatch file error: " + (char)27 + "[0mFile not found: " + filename);
+		}
+		catch (IOException e) {
+			System.err.println((char)27 + "[31;1mBatch file error: " + (char)27 + "[0m" + e.getLocalizedMessage());
 		}
 	}
 

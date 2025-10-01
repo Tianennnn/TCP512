@@ -1,0 +1,8 @@
+#Test for add and reserve
+AddCustomerID,123
+AddFlight,200,5,500
+QueryFlight,200
+ReserveFlight,123,200
+QueryCustomer,123
+QueryFlight,200
+DeleteFlight,200
