@@ -5,9 +5,6 @@ import MiddleWare.Common.Customer;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Singleton class for managing customers in a distributed system
- */
 public class CustomerManager {
 
     // Singleton instance
@@ -22,12 +19,7 @@ public class CustomerManager {
         this.customers = new HashMap<>();
     }
 
-    /**
-     * Gets the singleton instance of CustomerManager
-     * Thread-safe implementation using double-checked locking
-     *
-     * @return The singleton instance
-     */
+
     public static CustomerManager getInstance() {
         if (instance == null) {
             synchronized (CustomerManager.class) {
@@ -39,11 +31,7 @@ public class CustomerManager {
         return instance;
     }
 
-    /**
-     * Creates a new customer and save it in the record.
-     *
-     * @return Unique customer identifier
-     */
+
     public synchronized int newCustomer() {
         while (customers.containsKey(nextCustomerId)) {
             nextCustomerId++;
@@ -52,12 +40,6 @@ public class CustomerManager {
         return nextCustomerId++;
     }
 
-    /**
-     * Creates a new customer with specified id and save it in the record
-     *
-     * @param cid The customer ID to create
-     * @return Success status
-     */
     public synchronized boolean newCustomer(int cid) {
         if (customers.containsKey(cid)) {
             return false;

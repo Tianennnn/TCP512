@@ -69,7 +69,6 @@ public class TCPMiddleware implements IResourceManager {
                 System.out.println("Connected to " + serverName + " resource manager");
                 return true;
             } catch (IOException e) {
-                // System.err.println("Failed to connect to " + serverName + ": " + e.getMessage());
                 connected = false;
                 return false;
             }
@@ -133,14 +132,10 @@ public class TCPMiddleware implements IResourceManager {
 
                 while (!clientSocket.isClosed()) {
                     try {
-                        // Read message from client
                         TCPMessage message = (TCPMessage) in.readObject();
                         System.out.println("Received from client " + clientId + ": " + message);
-
-                        // Process the message and get response
                         Object result = processClientMessage(message);
 
-                        // Send response back to client
                         out.writeObject(result);
                         out.flush();
 
@@ -149,8 +144,8 @@ public class TCPMiddleware implements IResourceManager {
                         System.out.println("Client " + clientId + " disconnected");
                         break;
                     } catch (Exception e) {
-                        System.err.println("Error processing message from client " + clientId + ": " + e.getMessage());
                         try {
+                            //REturn the error message, doesn't make much sense when expected output is an integer
                             out.writeObject("ERROR: " + e.getMessage());
                             out.flush();
                         } catch (IOException ioEx) {
@@ -170,7 +165,6 @@ public class TCPMiddleware implements IResourceManager {
             String operation = message.getOperation();
             Object[] params = message.getParameters();
 
-            // Process the message using middleware business logic
             switch (operation) {
                 case "addFlight":
                     return addFlight((Integer) params[0], (Integer) params[1], (Integer) params[2]);
@@ -255,7 +249,7 @@ public class TCPMiddleware implements IResourceManager {
                 if (in != null) in.close();
                 if (out != null) out.close();
                 if (clientSocket != null) clientSocket.close();
-                System.out.println("Client handler cleanup completed for: " + clientId);
+                System.out.println("Client exited: " + clientId);
             } catch (IOException e) {
                 System.err.println("Error during cleanup for client " + clientId + ": " + e.getMessage());
             }
@@ -273,7 +267,7 @@ public class TCPMiddleware implements IResourceManager {
         try {
             TCPMiddleware middleware = new TCPMiddleware();
 
-            // Connect to resource managers
+            //Connect to RMs
             middleware.connectToResourceManagers();
 
             // Start TCP server for clients
@@ -287,11 +281,14 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     public TCPMiddleware() {
+        //Initalize, or get singleton instance
         customerManager = CustomerManager.getInstance();
         m_Flights_available = new HashMap<>();
         m_Cars_available = new HashMap<>();
         m_Rooms_available = new HashMap<>();
-        threadPool = Executors.newFixedThreadPool(20);
+
+        //All clientHandler goes into this pool
+        threadPool = Executors.newFixedThreadPool(30); //30 shoudl be enough lol
         System.out.println("DEBUG: TCPMiddleware constructor - initialized data structures");
     }
 
@@ -350,13 +347,11 @@ public class TCPMiddleware implements IResourceManager {
             stopServer();
         }));
 
-        // Accept client connections
         while (running) {
             try {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("New client connected: " + clientSocket.getRemoteSocketAddress());
 
-                // Create handler for this client
                 ClientHandler handler = new ClientHandler(clientSocket);
                 threadPool.submit(handler);
 
@@ -376,7 +371,6 @@ public class TCPMiddleware implements IResourceManager {
             }
             threadPool.shutdown();
 
-            // Disconnect from resource managers
             if (flightRM != null) flightRM.disconnect();
             if (carRM != null) carRM.disconnect();
             if (roomRM != null) roomRM.disconnect();
@@ -385,6 +379,9 @@ public class TCPMiddleware implements IResourceManager {
             System.err.println("Error closing server socket: " + e.getMessage());
         }
     }
+
+    // Many method here are labeled synchronized since there is a change it would be called by multiple thread
+    // "synchonized" ensures thread safty, common resources such as the maps and RMs, are thread safe
 
 
     public synchronized boolean addFlight(int flightNum, int flightSeats, int flightPrice) throws RemoteException {

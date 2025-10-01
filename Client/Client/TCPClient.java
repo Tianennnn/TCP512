@@ -101,18 +101,17 @@ public class TCPClient extends Client
 			try {
 				TCPMessage message = new TCPMessage(operation, parameters);
 
-				// Log what we're sending
-				System.out.println("DEBUG: Sending operation '" + operation + "' with " +
-						(parameters != null ? parameters.length : 0) + " parameters");
+//				System.out.println("DEBUG: Sending operation '" + operation + "' with " +
+//						(parameters != null ? parameters.length : 0) + " parameters");
 
 				out.writeObject(message);
 				out.flush();
 
-				System.out.println("DEBUG: Message sent, waiting for response...");
+				//System.out.println("DEBUG: Message sent, waiting for response...");
 
 				Object response = in.readObject();
 
-				System.out.println("DEBUG: Received response of type: " + response.getClass().getName());
+//				System.out.println("DEBUG: Received response of type: " + response.getClass().getName());
 
 				if (response instanceof String && ((String) response).startsWith("ERROR:")) {
 					String errorMsg = ((String) response).substring(7);
@@ -121,35 +120,9 @@ public class TCPClient extends Client
 
 				return response;
 
-			} catch (IOException e) {
-				connected = false;
-				String detailedMsg = String.format(
-						"IO error during operation '%s': %s (Type: %s)",
-						operation,
-						e.getMessage(),
-						e.getClass().getSimpleName()
-				);
-				throw new RemoteException(detailedMsg, e);
-
-			} catch (ClassNotFoundException e) {
-				connected = false;
-				String detailedMsg = String.format(
-						"Serialization error during operation '%s': Cannot find class '%s'. " +
-								"This usually means client and server have incompatible TCPMessage classes.",
-						operation,
-						e.getMessage()
-				);
-				throw new RemoteException(detailedMsg, e);
-
 			} catch (Exception e) {
 				connected = false;
-				String detailedMsg = String.format(
-						"Unexpected error during operation '%s': %s (Type: %s)",
-						operation,
-						e.getMessage(),
-						e.getClass().getSimpleName()
-				);
-				throw new RemoteException(detailedMsg, e);
+				throw new RemoteException("Something is wrong", e);
 			}
 		}
 

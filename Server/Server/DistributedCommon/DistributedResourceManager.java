@@ -22,10 +22,6 @@ public class DistributedResourceManager implements IResourceManager {
         m_name = p_name;
     }
 
-    // Reads a data item
-
-    // Create a new flight, or add seats to existing flight
-    // NOTE: if flightPrice <= 0 and the flight already exists, it maintains its current price
     public boolean addFlight(int flightNum, int flightSeats, int flightPrice) throws RemoteException
     {
         Trace.info("RM::addFlight(" + flightNum + ", " + flightSeats + ", $" + flightPrice + ") called");
@@ -51,8 +47,7 @@ public class DistributedResourceManager implements IResourceManager {
         return true;
     }
 
-    // Create a new car location or add cars to an existing location
-    // NOTE: if price <= 0 and the location already exists, it maintains its current price
+
     public boolean addCars(String location, int numCars, int price) throws RemoteException {
         Trace.info("RM::addCars(" + location + ", " + numCars + ", $" + price + ") called");
         DistributedCar curObj = m_car.get(location);
@@ -73,19 +68,14 @@ public class DistributedResourceManager implements IResourceManager {
         return true;
     }
 
-
-    // Create a new room location or add rooms to an existing location
-    // NOTE: if price <= 0 and the room location already exists, it maintains its current price
     public boolean addRooms(String location, int numRooms, int price) throws RemoteException {
         Trace.info("RM::addRooms(" + location + ", " + numRooms + ", $" + price + ") called");
         DistributedRoom curObj = m_rooms.get(location);
         if (curObj == null) {
-            // Doesn't exist yet, add it
             DistributedRoom newObj = new DistributedRoom(location, numRooms, price);
             m_rooms.put(location, newObj);
             Trace.info("RM::addRooms() created new rooms at " + location + ", count=" + numRooms + ", price=$" + price);
         } else {
-            // Add rooms to existing location and update the price if greater than zero
             curObj.setRooms(curObj.getRooms() + numRooms);
             if (price > 0) {
                 curObj.setPrice(price);
@@ -97,7 +87,6 @@ public class DistributedResourceManager implements IResourceManager {
     }
 
 
-    // Deletes flight
     public boolean deleteFlight(int flightNum) throws RemoteException
     {
         if (m_flights.containsKey(flightNum)){
@@ -109,7 +98,6 @@ public class DistributedResourceManager implements IResourceManager {
         }
     }
 
-    // Delete cars at a location
     public boolean deleteCars(String location) throws RemoteException
     {
         if (m_car.containsKey(location)){
@@ -121,7 +109,6 @@ public class DistributedResourceManager implements IResourceManager {
         }
     }
 
-    // Delete rooms at a location
     public boolean deleteRooms(String location) throws RemoteException
     {
         if (m_rooms.containsKey(location)){
@@ -133,8 +120,6 @@ public class DistributedResourceManager implements IResourceManager {
         }
     }
 
-    // Returns the number of empty seats in this flight
-    // Returns the number of seats in the flight
     public int queryFlight(int flightNum) throws RemoteException {
         int value = 0;
         DistributedFlight curObj = m_flights.get(flightNum);
@@ -144,7 +129,6 @@ public class DistributedResourceManager implements IResourceManager {
         return value;
     }
 
-    // Returns the number of cars available at a location
     public int queryCars(String location) throws RemoteException {
         int value = 0;
         DistributedCar curObj = m_car.get(location);
@@ -154,7 +138,7 @@ public class DistributedResourceManager implements IResourceManager {
         return value;
     }
 
-    // Returns the number of rooms available at a location
+
     public int queryRooms(String location) throws RemoteException {
         int value = 0;
         DistributedRoom curObj = m_rooms.get(location);
@@ -164,7 +148,7 @@ public class DistributedResourceManager implements IResourceManager {
         return value;
     }
 
-    // Returns price of a seat in this flight
+
     public int queryFlightPrice(int flightNum) throws RemoteException {
         int price = 0;
         DistributedFlight curObj = m_flights.get(flightNum);
@@ -174,7 +158,7 @@ public class DistributedResourceManager implements IResourceManager {
         return price;
     }
 
-    // Returns price of cars at this location
+
     public int queryCarsPrice(String location) throws RemoteException {
         int price = 0;
         DistributedCar curObj = m_car.get(location);
@@ -184,7 +168,7 @@ public class DistributedResourceManager implements IResourceManager {
         return price;
     }
 
-    // Returns room price at this location
+
     public int queryRoomsPrice(String location) throws RemoteException {
         int price = 0;
         DistributedRoom curObj = m_rooms.get(location);
@@ -193,6 +177,8 @@ public class DistributedResourceManager implements IResourceManager {
         }
         return price;
     }
+
+    //Customer related methods are not implemented. They are processed in the Middleware
 
     public String queryCustomerInfo(int customerID) throws RemoteException
     {
