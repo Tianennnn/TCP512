@@ -28,7 +28,7 @@ public abstract class TestClient
 
         BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 
-        for (int i = 0; i<105; i++)
+        for (int i = 0; i<101; i++)
         {
 
             String command = "AddCars,Montreal,1,1";
