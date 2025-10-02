@@ -9,12 +9,12 @@ import java.util.Vector;
 public class TCPDistributedManager extends DistributedResourceManager {
 
     public static String s_serverName = "Server";
-    public int s_serverPort = 1045;
+    public int s_serverPort = 1145;
     private ServerSocket serverSocket;
     private volatile boolean isRunning = false;
 
     public static void main(String args[]) {
-        int serverPort = 1045;
+        int serverPort = 1145;
         if (args.length > 0) {
             TCPDistributedManager.s_serverName = args[0];
         }

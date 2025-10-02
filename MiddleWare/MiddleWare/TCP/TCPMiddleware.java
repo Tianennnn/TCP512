@@ -12,8 +12,8 @@ import java.rmi.RemoteException;
 public class TCPMiddleware implements IResourceManager {
 
     private static String s_middleWareName = "MiddleWare";
-    private static int s_middleWarePort = 1046;  // Port for client connections
-    private static int s_serverPort = 1045;     // Base port for resource managers
+    private static int s_middleWarePort = 1146;  // Port for client connections
+    private static int s_serverPort = 1145;     // Base port for resource managers
 
     // Server connection details
     private static String s_server_car = "localhost";
