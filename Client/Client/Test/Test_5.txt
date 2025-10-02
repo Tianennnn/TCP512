@@ -1,0 +1,13 @@
+# Test Update Flight Price
+
+# Set Up
+AddFlight,200,2,900
+
+
+AddFlight,200,2,800
+QueryFlightPrice,200
+# Expected: Price of a seat: 800
+
+AddFlight,200,2,700
+QueryFlightPrice,200
+# Expected: Price of a seat: 700

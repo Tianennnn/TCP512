@@ -1,0 +1,22 @@
+# Test for add and reserve
+
+# Set Up
+AddCustomerID,123
+AddFlight,200,5,500
+
+
+QueryFlight,200
+# Expected: 5 available seats
+
+ReserveFlight,123,200
+# Expected: successful reservation
+
+QueryCustomer,123
+# Expected: 1 flight reservation for 200
+
+QueryFlight,200
+# Expected: 4 available seats
+
+DeleteFlight,200
+# Expected: Failure (since at least 1 seat of the flight has been reserved)
+
