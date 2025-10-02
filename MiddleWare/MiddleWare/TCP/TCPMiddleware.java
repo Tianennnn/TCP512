@@ -691,10 +691,15 @@ public class TCPMiddleware implements IResourceManager {
         }
 
         // Check if all requested items are available
+        HashMap<Integer, Integer> to_be_reserved_flights = new HashMap<>();
         for (String flightNumber : flightNumbers) {
             int flightNumberInt = Integer.parseInt(flightNumber);
-            if (!m_Flights_available.containsKey(flightNumberInt) || m_Flights_available.get(flightNumberInt) <= 0) {
-                System.out.println("DEBUG: bundle failed - flight " + flightNumber + " not available");
+            to_be_reserved_flights.merge(flightNumberInt, 1, Integer::sum);
+        }
+        for (Integer flight : to_be_reserved_flights.keySet()) {
+            if (!m_Flights_available.containsKey(flight)
+                    || m_Flights_available.get(flight) < to_be_reserved_flights.get(flight)) {
+                System.out.println("DEBUG: bundle failed - flight " + Integer.toString(flight) + " not available");
                 return false;
             }
         }
