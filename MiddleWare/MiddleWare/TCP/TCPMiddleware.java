@@ -674,38 +674,55 @@ public class TCPMiddleware implements IResourceManager {
     }
 
     @Override
-    public synchronized boolean bundle(int customerID, Vector<String> flightNumbers, String location, boolean car, boolean room) throws RemoteException {
-        System.out.println("DEBUG: bundle called - Customer: " + customerID + ", Flights: " + flightNumbers + ", Location: " + location + ", Car: " + car + ", Room: " + room);
+    /**
+     * Reserve a bundle for the trip.
+     *
+     * @return Success
+     */
+    public boolean bundle(int customerID, Vector<String> flightNumbers, String location, boolean car, boolean room)
+            throws RemoteException {
+        System.out.println("DEBUG: bundle called - Customer: " + customerID + ", Flights: " + flightNumbers
+                + ", Location: " + location + ", Car: " + car + ", Room: " + room);
 
+        // Check is the customer is valid
+        if (customerManager.getCustomer(customerID) == null) {
+            System.out.println("DEBUG: bundle failed - customer does not exist");
+            return false;
+        }
+
+        // Check if all requested items are available
         for (String flightNumber : flightNumbers) {
             int flightNumberInt = Integer.parseInt(flightNumber);
-            if (m_Flights_available.containsKey(flightNumberInt) && m_Flights_available.get(flightNumberInt) > 0) {
-                customerManager.reserveFlight(customerID, flightNumberInt);
-                m_Flights_available.merge(flightNumberInt, -1, Integer::sum);
-            } else {
+            if (!m_Flights_available.containsKey(flightNumberInt) || m_Flights_available.get(flightNumberInt) <= 0) {
                 System.out.println("DEBUG: bundle failed - flight " + flightNumber + " not available");
                 return false;
             }
         }
-
         if (car) {
-            if (m_Cars_available.containsKey(location) && m_Cars_available.get(location) > 0) {
-                customerManager.reserveCar(customerID, location);
-                m_Cars_available.merge(location, -1, Integer::sum);
-            } else {
+            if (!m_Cars_available.containsKey(location) || m_Cars_available.get(location) <= 0) {
                 System.out.println("DEBUG: bundle failed - car at " + location + " not available");
                 return false;
             }
         }
-
         if (room) {
-            if (m_Rooms_available.containsKey(location) && m_Rooms_available.get(location) > 0) {
-                customerManager.reserveRoom(customerID, location);
-                m_Rooms_available.merge(location, -1, Integer::sum);
-            } else {
+            if (!m_Rooms_available.containsKey(location) || m_Rooms_available.get(location) <= 0) {
                 System.out.println("DEBUG: bundle failed - room at " + location + " not available");
                 return false;
             }
+        }
+
+        for (String flightNumber : flightNumbers) {
+            int flightNumberInt = Integer.parseInt(flightNumber);
+            customerManager.reserveFlight(customerID, flightNumberInt);
+            m_Flights_available.merge(flightNumberInt, -1, Integer::sum);
+        }
+        if (car) {
+            customerManager.reserveCar(customerID, location);
+            m_Cars_available.merge(location, -1, Integer::sum);
+        }
+        if (room) {
+            customerManager.reserveRoom(customerID, location);
+            m_Rooms_available.merge(location, -1, Integer::sum);
         }
 
         System.out.println("DEBUG: bundle successful for customer " + customerID);

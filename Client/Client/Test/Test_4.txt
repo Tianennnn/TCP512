@@ -1,0 +1,25 @@
+# Test DeleteCustomer
+
+# Set Up
+AddCustomerID,123
+AddFlight,200,5,500
+AddFlight,211,5,500
+
+ReserveFlight,123,200
+ReserveFlight,123,200
+ReserveFlight,123,211
+
+QueryFlight,200
+# Expected: Number of seats available: 3
+QueryFlight,211
+# Expected: Number of seats available: 4
+
+DeleteCustomer,123 
+
+QueryFlight,200
+# Expected: Number of seats available: 5
+QueryFlight,211
+# Expected: Number of seats available: 5
+QueryCustomer,123
+# Expected: No reservations found for this customer.
+

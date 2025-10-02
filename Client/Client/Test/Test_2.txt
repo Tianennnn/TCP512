@@ -1,8 +1,13 @@
 #Test for Bundle
+
+#Set Up
 AddCustomerID,123
+AddFlight,200,2,900
 AddFlight,300,2,900
 AddCars,Montreal,10,50
 AddRooms,Montreal,10,50
-Bundle,123,200,200,300,Montreal,1,1
 
+
+Bundle,123,200,200,300,Montreal,1,1
+QueryCustomer,123 
 # Expected: 2 flight reservations for 200, 1 flight reservation for 300, 1 Montreal room reservation, 1 Montreal car reservation
