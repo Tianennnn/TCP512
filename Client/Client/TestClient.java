@@ -36,7 +36,7 @@ public abstract class TestClient
             }
 
             if (i == 10 || i == 20 || i == 30 || i == 40){
-                command = "ReserveCar," + id + ",1";
+                command = "ReserveCar," + id + ",Montreal";
             }
             // Read the next command
             Vector<String> arguments = new Vector<String>();
