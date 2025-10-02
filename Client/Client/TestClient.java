@@ -30,12 +30,13 @@ public abstract class TestClient
 
         for (int i = 0; i<105; i++)
         {
+
             String command = "AddCars,Montreal,1,1";
             if (i == 0){
                 command = "AddCustomerID," + id;
             }
 
-            if (i == 10 || i == 20 || i == 30 || i == 40){
+            if (i>20 && i<31){ //10 reservations
                 command = "ReserveCar," + id + ",Montreal";
             }
             // Read the next command
