@@ -49,7 +49,7 @@ public class TestTCPClient extends TestClient
 
                     latch.await();
 
-                    client1.start();
+                    client1.start("1");
                     System.out.println("Client 1 started at: " + System.nanoTime());
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -63,7 +63,7 @@ public class TestTCPClient extends TestClient
 
                     latch.await(); // Wait for the signal
 
-                    client2.start();
+                    client2.start("2");
                     System.out.println("Client 2 started at: " + System.nanoTime());
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();

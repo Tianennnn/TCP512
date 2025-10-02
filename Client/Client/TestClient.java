@@ -20,7 +20,7 @@ public abstract class TestClient
 
     public abstract void connectServer();
 
-    public void start()
+    public void start(String id)
     {
         // Prepare for reading commands
         System.out.println();
@@ -28,12 +28,17 @@ public abstract class TestClient
 
         BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 
-
-
-        for (int i = 1; i<100; i++)
+        for (int i = 0; i<105; i++)
         {
-            // Read the next command
             String command = "AddCars,Montreal,1,1";
+            if (i == 0){
+                command = "AddCustomerID," + id;
+            }
+
+            if (i == 10 || i == 20 || i == 30 || i == 40){
+                command = "ReserveCar," + id + ",1";
+            }
+            // Read the next command
             Vector<String> arguments = new Vector<String>();
             try {
                 arguments = parse(command);
