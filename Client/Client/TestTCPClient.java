@@ -13,7 +13,7 @@ import java.util.concurrent.CountDownLatch;
 public class TestTCPClient extends TestClient
 {
     private static String s_serverHost = "localhost";
-    private static int s_serverPort = 1046;
+    private static int s_serverPort = 1146;
     private static String s_serverName = "MiddleWare";
 
     // TCP connection components
